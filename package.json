@@ -28,6 +28,8 @@
     "async": "^2.1.4",
     "chalk": "^1.1.3",
     "cheerio": "^0.22.0",
-    "minimist": "^1.2.0"
+    "minimist": "^1.2.0",
+    "prettysize": "0.0.3",
+    "request-progress": "^3.0.0"
   }
 }

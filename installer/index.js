@@ -12,5 +12,7 @@ async.waterfall([
   // Show OS platform
   utility.showPlatform,
   // Show Download link
-  utility.showDownloadLink
+  utility.showDownloadLink,
+  // Download new source
+  utility.downloadWebIDE
 ]);
