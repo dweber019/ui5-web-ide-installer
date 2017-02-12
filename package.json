@@ -4,8 +4,8 @@
   "description": "This nodeJS programm helps to install the SAPUI5 Web IDE",
   "main": "installer/index.js",
   "scripts": {
-    "install:ide": "node ./installer/index.js -m install",
-    "update:ide": "node ./installer/index.js -m update",
+    "ide:install": "node ./installer/index.js -m install",
+    "ide:update": "node ./installer/index.js -m update",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

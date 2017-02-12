@@ -20,6 +20,7 @@ const exec = require('child_process').exec;
 let platform;
 let downloadLink;
 let installationPath;
+let backupDir;
 
 function initialize() {
   // Get platform
@@ -37,6 +38,11 @@ function initialize() {
   } else {
     installationPath = path.resolve('/SAPWebIDE');
   }
+
+  if (installationModus === 'update') {
+    backupDir = path.resolve(process.cwd(), 'backup');
+    fs.mkdirSync(backupDir)
+  }
 }
 
 function showModus(cb) {
@@ -48,7 +54,7 @@ function showModus(cb) {
       || fs.existsSync(path.resolve(installationPath, 'eclipse/artifacts.xml'))
     )
   ) {
-    log(chalk.red.bold('There is already a installation of Web IDE, probably you like to update with \'npm run update:ide\'?'));
+    log(chalk.red.bold('There is already a installation of Web IDE, probably you like to update with \'npm run ide:update\'?'));
     process.exit(1);
   }
 
@@ -142,6 +148,15 @@ function round(value, precision) {
 }
 
 function installWebIDE(cb) {
+
+  if (installationModus === 'update') {
+    backupIDE(() => extractIDE(cb));
+  } else {
+    extractIDE(cb);
+  }
+}
+
+function extractIDE(cb) {
   log(chalk.yellow.bold('Start unzipping of Web IDE'));
   fs.createReadStream('webide.zip')
     .on('end', () => {
@@ -166,8 +181,16 @@ function postActions(cb) {
   }
 }
 
+function backupIDE(cb) {
+
+  cb();
+}
+
 function cleanUp(cb) {
   fs.unlinkSync(path.resolve('webide.zip'));
+  if (fs.existsSync(backupDir)) {
+    fs.unlinkSync(backupDir);
+  }
   cb();
 }
 
