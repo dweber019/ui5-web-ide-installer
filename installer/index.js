@@ -1,12 +1,16 @@
 // Import agruments
-const argv = require('minimist')(process.argv.slice(2));
-const installationModus = argv.m;
-
 // Import helper
 const utility = require('./utility');
 
-// Show installation modus
-utility.printEmp('Modus', installationModus);
+// Import async
+const async = require('async');
 
-// Show OS platform
-utility.printEmp('Platform', utility.getPlatform());
+// Start programm
+async.waterfall([
+  // Show installation modus
+  utility.showModus,
+  // Show OS platform
+  utility.showPlatform,
+  // Show Download link
+  utility.showDownloadLink
+]);
