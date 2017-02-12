@@ -14,5 +14,11 @@ async.waterfall([
   // Show Download link
   utility.showDownloadLink,
   // Download new source
-  utility.downloadWebIDE
+  utility.downloadWebIDE,
+  // Install Web IDE
+  utility.installWebIDE,
+  // Post actions
+  utility.postActions,
+  // Clean up
+  utility.cleanUp
 ]);
