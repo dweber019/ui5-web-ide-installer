@@ -14,7 +14,8 @@ const request = require('request');
 const progress = require('request-progress');
 const pretty = require('prettysize');
 const path = require('path');
-const extract = require('extract-zip');
+const unzipper = require('unzipper');
+const exec = require('child_process').exec;
 
 let platform;
 let downloadLink;
@@ -41,7 +42,12 @@ function initialize() {
 function showModus(cb) {
   log(chalk.yellow.bold('Modus: ') + installationModus);
 
-  if (installationModus === 'install' && fs.existsSync(path.resolve(installationPath, 'artifacts.xml'))) {
+  if (installationModus === 'install'
+    && (
+      fs.existsSync(path.resolve(installationPath, 'eclipse/artifacts.xml'))
+      || fs.existsSync(path.resolve(installationPath, 'eclipse/artifacts.xml'))
+    )
+  ) {
     log(chalk.red.bold('There is already a installation of Web IDE, probably you like to update with \'npm run update:ide\'?'));
     process.exit(1);
   }
@@ -103,7 +109,7 @@ function praseDownloadLink(body) {
 
 function downloadWebIDE(cb) {
   log(chalk.yellow.bold('Start downloading new Web IDE'));
-  progress(request({url: downloadLink, headers: {Cookie: 'eula_3.1_agreed=tools.hana.ondemand.com/developer-license-3.1.txt'}}), {
+  progress(request({ url: downloadLink, headers: { Cookie: 'eula_3.1_agreed=tools.hana.ondemand.com/developer-license-3.1.txt' } }), {
     throttle: 2000
   })
     .on('progress', function (state) {
@@ -137,19 +143,27 @@ function round(value, precision) {
 
 function installWebIDE(cb) {
   log(chalk.yellow.bold('Start unzipping of Web IDE'));
-  extract('webide.zip', {dir: installationPath}, function (err) {
-    if (err) {
-      log(chalk.red.bold('An error occured while unzipping') + err);
-      process.exit(1);
-    }
-    log(chalk.green.bold('Web IDE installed to'), installationPath);
-    cb();
-  })
+  fs.createReadStream('webide.zip')
+    .on('end', () => {
+      log(chalk.green.bold('Web IDE installed to'), installationPath);
+      cb();
+    })
+    .pipe(unzipper.Extract({ path: installationPath }));
 }
 
 function postActions(cb) {
-
-  cb();
+  if (getPlatform() === 'darwin') {
+    exec('xattr -r -c *', { cwd: path.resolve(installationPath, 'eclipse') }, function (error, stdout, stderr) {
+      if (error !== null) {
+        log(chalk.red.bold('An error occured while executing post actions') + error);
+        process.exit(1);
+      }
+      log(chalk.yellow.bold('Post actions run for darwin'));
+      cb();
+    });
+  } else {
+    cb();
+  }
 }
 
 function cleanUp(cb) {
