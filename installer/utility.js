@@ -133,9 +133,12 @@ function downloadWebIDE(cb) {
     })
     .on('end', function () {
       log(chalk.green.bold('New Web IDE downloaded'));
-      cb();
     })
-    .pipe(fs.createWriteStream('webide.zip'));
+    .pipe(fs.createWriteStream('webide.zip'))
+    .on('finish', function () {
+      log(chalk.green.bold('Written file to disk'));
+      cb();
+    });
 }
 
 function prettifyByte(byte) {
@@ -159,11 +162,12 @@ function installWebIDE(cb) {
 function extractIDE(cb) {
   log(chalk.yellow.bold('Start unzipping of Web IDE'));
   fs.createReadStream('webide.zip')
-    .on('end', () => {
+    .pipe(unzipper.Extract({ path: installationPath }))
+    .on('finish', () => {
       log(chalk.green.bold('Web IDE installed to'), installationPath);
       cb();
     })
-    .pipe(unzipper.Extract({ path: installationPath }));
+    .on('error', e => console.log('error', e));
 }
 
 function postActions(cb) {
