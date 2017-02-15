@@ -187,12 +187,23 @@ function postActions(cb) {
 }
 
 function backupIDE(cb) {
+  log(chalk.yellow.bold('Start backup'));
+  let orionIni, orionConf, destination, serverworkspace;
+  if (getPlatform() === 'darwin') {
+    orionIni = path.resolve(installationPath, 'eclipse/orion.app/Contents/MacOS/orion.ini');
+    orionConf = path.resolve(installationPath, 'eclipse/orion.app/Contents/MacOS/orion.ini'); // not available
+    destination = path.resolve(installationPath, 'eclipse/orion.app/Contents/MacOS/orion.ini'); // not available
+    serverworkspace = path.resolve(installationPath, 'eclipse/orion.app/Contents/MacOS/serverworkspace');
+  } else {
 
+  }
   cb();
 }
 
 function cleanUp(cb) {
-  fs.unlinkSync(path.resolve('webide.zip'));
+  if (fs.existsSync(path.resolve('webide.zip'))) {
+    fs.unlinkSync(path.resolve('webide.zip'));
+  }
   if (fs.existsSync(backupDir)) {
     fs.unlinkSync(backupDir);
   }
