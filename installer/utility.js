@@ -14,8 +14,8 @@ const request = require('request');
 const progress = require('request-progress');
 const pretty = require('prettysize');
 const path = require('path');
-const unzipper = require('unzipper');
 const exec = require('child_process').exec;
+const unzip = require('cross-unzip');
 
 let platform;
 let downloadLink;
@@ -161,13 +161,14 @@ function installWebIDE(cb) {
 
 function extractIDE(cb) {
   log(chalk.yellow.bold('Start unzipping of Web IDE'));
-  fs.createReadStream('webide.zip')
-    .pipe(unzipper.Extract({ path: installationPath }))
-    .on('finish', () => {
-      log(chalk.green.bold('Web IDE installed to'), installationPath);
-      cb();
-    })
-    .on('error', e => console.log('error', e));
+  unzip('webide.zip', installationPath, (err) => {
+    if (err) {
+      log(chalk.red.bold('An error occured while unzipping') + err);
+      process.exit(1);
+    }
+    log(chalk.green.bold('Web IDE installed to'), installationPath);
+    cb();
+  })
 }
 
 function postActions(cb) {
